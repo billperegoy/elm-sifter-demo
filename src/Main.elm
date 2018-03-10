@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (Html, beginnerProgram)
 import Element
 import Element.Attributes exposing (..)
+import Element.Input
 import Style exposing (..)
 import Style.Font as Font
 import Style.Color as Color
@@ -25,12 +26,12 @@ main =
 
 
 type alias Model =
-    { name : String }
+    { searchText : String }
 
 
 init : Model
 init =
-    Model "world"
+    Model ""
 
 
 
@@ -38,22 +39,24 @@ init =
 
 
 type Msg
-    = NoOp
+    = SetSearchText String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        NoOp ->
-            model
+        SetSearchText value ->
+            { model | searchText = value }
 
 
 type MyStyles
     = Header
+    | Footer
     | Page
     | Body
     | Results
     | Config
+    | ConfigBox
     | Content
     | Form
     | FormBox
@@ -91,6 +94,12 @@ stylesheet =
             , Color.background colors.headerBackground
             , Font.typeface [ Font.sansSerif ]
             , Font.size 64
+            ]
+        , Style.style Footer
+            [ Color.text colors.textBase
+            , Color.background colors.headerBackground
+            , Font.typeface [ Font.sansSerif ]
+            , Font.size 18
             ]
         , Style.style Body
             [ Color.text colors.textBase
@@ -152,7 +161,7 @@ header model =
 
 footer : Model -> Element.Element MyStyles variation Msg
 footer model =
-    Element.row Header
+    Element.row Footer
         [ width (percent 100)
         , paddingLeft 50
         , paddingTop 20
@@ -186,9 +195,9 @@ formElements : Model -> Element.Element MyStyles variation Msg
 formElements model =
     Element.column FormElements
         [ paddingTop 30 ]
-        [ Element.el ConfigHeader [] (Element.text "Configuration")
+        [ Element.el ConfigHeader [] (Element.text "Config Editor")
         , Element.row FormBox
-            [ spacing 80
+            [ spacing 30
             , alignLeft
             , paddingTop 5
             ]
@@ -202,7 +211,7 @@ formElements model =
 formItem : Model -> Element.Element MyStyles variation Msg
 formItem model =
     Element.column Form
-        [ width (px 300)
+        [ width (percent 30)
         , padding 7
         ]
         [ Element.el FormItem [] (Element.text "form element")
@@ -215,8 +224,8 @@ mainContent : Model -> Element.Element MyStyles variation Msg
 mainContent model =
     Element.row Content
         [ alignLeft
-        , spacing 80
-        , paddingTop 20
+        , spacing 30
+        , paddingTop 40
         ]
         [ config model
         , results model
@@ -225,17 +234,45 @@ mainContent model =
 
 config : Model -> Element.Element MyStyles variation Msg
 config model =
-    Element.column Config
-        [ padding 7
-        , width (px 500)
+    Element.column ConfigBox
+        [ width (percent 50) ]
+        [ Element.el ConfigHeader [] (Element.text "Config")
+        , Element.column Config
+            [ padding 7 ]
+            [ Element.el None [] (Element.text "config")
+            , Element.el None [] (Element.text "config")
+            , Element.el None [] (Element.text "config")
+            , Element.el None [] (Element.text "config")
+            , Element.el None [] (Element.text "config")
+            , Element.el None [] (Element.text "config")
+            ]
         ]
-        [ Element.el None [] (Element.text "config") ]
 
 
 results : Model -> Element.Element MyStyles variation Msg
 results model =
-    Element.column Results
-        [ padding 7
-        , width (px 500)
+    Element.column ConfigBox
+        [ width (percent 50) ]
+        [ Element.Input.text None
+            []
+            { label =
+                Element.Input.placeholder
+                    { label =
+                        Element.Input.labelLeft
+                            (Element.el None [ verticalCenter ] (Element.text "Search For:"))
+                    , text = ""
+                    }
+            , onChange = SetSearchText
+            , options = []
+            , value = ""
+            }
+        , Element.el ConfigHeader [ paddingTop 10 ] (Element.text "Search Results")
+        , Element.column Config
+            [ padding 7 ]
+            [ Element.el None [] (Element.text "results")
+            , Element.el None [] (Element.text "results")
+            , Element.el None [] (Element.text "results")
+            , Element.el None [] (Element.text "results")
+            , Element.el None [] (Element.text "results")
+            ]
         ]
-        [ Element.el None [] (Element.text "results") ]
