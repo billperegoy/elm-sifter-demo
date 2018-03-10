@@ -3,7 +3,7 @@ module Main exposing (..)
 import Html exposing (Html, beginnerProgram)
 import Element
 import Element.Attributes exposing (..)
-import Element.Input
+import Element.Input as Input
 import Style exposing (..)
 import Style.Font as Font
 import Style.Color as Color
@@ -186,16 +186,24 @@ body model =
         , paddingBottom 30
         ]
         [ Element.paragraph Intro [ paddingTop 20 ] [ Element.text introText ]
+        , searchBar model
         , formElements model
         , mainContent model
         ]
 
 
+searchBar : Model -> Element.Element MyStyles variation Msg
+searchBar model =
+    Element.column FormElements
+        [ paddingTop 30 ]
+        [ searchInput model ]
+
+
 formElements : Model -> Element.Element MyStyles variation Msg
 formElements model =
     Element.column FormElements
-        [ paddingTop 30 ]
-        [ Element.el ConfigHeader [] (Element.text "Config Editor")
+        []
+        [ Element.el ConfigHeader [ paddingTop 20 ] (Element.text "Config Editor")
         , Element.row FormBox
             [ spacing 30
             , alignLeft
@@ -249,24 +257,28 @@ config model =
         ]
 
 
+searchInput : Model -> Element.Element MyStyles variation Msg
+searchInput model =
+    Input.search None
+        [ width (px 300) ]
+        { label =
+            Input.placeholder
+                { label =
+                    Input.labelLeft
+                        (Element.el None [ verticalCenter ] (Element.text "Search For:"))
+                , text = ""
+                }
+        , onChange = SetSearchText
+        , options = []
+        , value = ""
+        }
+
+
 results : Model -> Element.Element MyStyles variation Msg
 results model =
     Element.column ConfigBox
         [ width (percent 50) ]
-        [ Element.Input.text None
-            []
-            { label =
-                Element.Input.placeholder
-                    { label =
-                        Element.Input.labelLeft
-                            (Element.el None [ verticalCenter ] (Element.text "Search For:"))
-                    , text = ""
-                    }
-            , onChange = SetSearchText
-            , options = []
-            , value = ""
-            }
-        , Element.el ConfigHeader [ paddingTop 10 ] (Element.text "Search Results")
+        [ Element.el ConfigHeader [ paddingTop 10 ] (Element.text "Search Results")
         , Element.column Config
             [ padding 7 ]
             [ Element.el None [] (Element.text "results")
